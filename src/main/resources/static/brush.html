@@ -1,0 +1,366 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <link href="https://cdnjs.webstatic.cn/ajax/libs/extjs/3.4.1-1/resources/css/ext-all-notheme.css" rel="stylesheet">
+    <link href="https://cdnjs.webstatic.cn/ajax/libs/extjs/3.4.1-1/resources/css/xtheme-gray.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="/ActionColumn.css" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="/RowEditor.css"/>
+    <link rel="stylesheet" type="text/css" href="/icons.css"/>
+
+    <link rel="stylesheet" type="text/css" href="/date-time-ux.css"/>
+
+    <script src="https://cdnjs.webstatic.cn/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        (function ($) {
+            ($).getJs = function (url, callback, cache) {
+                ($).ajax({
+                    type: 'GET',
+                    url: url,
+                    success: callback,
+                    dataType: 'script',
+                    ifModified: true,
+                    cache: cache
+                });
+            };
+            ($).postJson = function (url, params, callback) {
+                ($).post(url, params, callback, 'json');
+            };
+        })(jQuery);
+    </script>
+
+    <script src="https://cdnjs.webstatic.cn/ajax/libs/extjs/3.4.1-1/adapter/jquery/ext-jquery-adapter.js"></script>
+    <script src="https://cdnjs.webstatic.cn/ajax/libs/extjs/3.4.1-1/ext-all.js"></script>
+    <script src="/cn.js"></script>
+
+    <script type="text/javascript" src="/TabCloseMenu.js"></script>
+
+    <script type="text/javascript" src="/SearchField.js"></script>
+
+    <script type="text/javascript" src="/PageSizePlugin.js"></script>
+
+    <script type="text/javascript" src="/ActionColumn.js"></script>
+
+    <script type="text/javascript" src="/RowEditor.js"></script>
+
+    <!--<script type="text/javascript" src="/SpinnerField.js"></script>
+    <script type="text/javascript" src="/Spinner.js"></script>
+    <script type="text/javascript" src="/DateTimeField.js"></script>-->
+
+    <script type="text/javascript" src="/date-time-ux.js"></script>
+
+    <script type="text/javascript" src="/edit_area/edit_area_full.js"></script>
+
+    <script type="text/javascript" src="/EditArea.js"></script>
+
+    <script type="text/javascript" src="/tree"></script>
+
+    <script src="https://cdnjs.webstatic.cn/ajax/libs/dayjs/1.10.8/dayjs.min.js"></script>
+
+    <script type="text/javascript">
+        String.prototype.trim = function () {
+            var str = this,
+                whitespace = ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
+            for (var i = 0, len = str.length; i < len; i++) {
+                if (whitespace.indexOf(str.charAt(i)) === -1) {
+                    str = str.substring(i);
+                    break;
+                }
+            }
+            for (var i = str.length - 1; i >= 0; i--) {
+                if (whitespace.indexOf(str.charAt(i)) === -1) {
+                    str = str.substring(0, i + 1);
+                    break;
+                }
+            }
+            return whitespace.indexOf(str.charAt(0)) === -1 ? str : '';
+        }
+        var DbNameTree = DbnamesTree;
+        Ext.onReady(function () {
+
+            Ext.QuickTips.init();
+            Ext.form.Field.prototype.msgTarget = 'side';
+
+            var basePath = location.href, index = basePath.indexOf('?');
+            if (index > 0) {
+                basePath = basePath.substring(0, index);
+            }
+            basePath = basePath.substring(0, basePath.lastIndexOf('/') + 1);
+
+            var boss = '';
+            index = location.href.indexOf('boss=');
+            if (index > 0) {
+                boss = location.href.substring(index + 5);
+                index = boss.indexOf('&');
+                if (index > 0) {
+                    boss = boss.substring(0, index);
+                }
+            }
+
+            var textareaIndex = 0, textareaHeight = parseInt(document.body.clientHeight / 3 + '');
+
+            var result = new Ext.Panel({
+                title: '下面显示执行结果',
+                region: 'center',
+                border: false,
+                layout: 'fit'
+            });
+
+            ($).postJson('/db', {}, function (json) {
+
+                var dbs = json.props.dbs;
+
+                for (var i = 0, len = dbs.length; i < len; i++) {
+                    var db = dbs[i];
+                    dbs[i] = {k: db, v: db};
+                }
+
+                var storeCfg = {
+                    fields: ['k', 'v'],
+                    data: dbs
+                }
+
+                var defaultTabConfig = {
+                    title: '查询编辑器',
+                    tbar: [{
+                        text: '新建',
+                        cls: 'x-btn-text-icon',
+                        iconCls: 'icon-new',
+                        handler: function (btn) {
+                            var iframe = window.frames[0].window;
+                            iframe.createNewTab();
+                        }
+                    }, '-', new Ext.form.ComboBox({
+                        id: 'dbCombo_' + textareaIndex,
+                        store: new Ext.data.JsonStore(Ext.apply({}, storeCfg)),
+                        mode: 'local',
+                        displayField: 'k',
+                        valueField: 'v',
+                        forceSelection: true,
+                        editable: false,
+                        triggerAction: 'all',
+                        listeners: {
+                            afterrender: function (combo) {
+                                var firstValue = combo.getStore().reader.jsonData[0].text;
+                                combo.setValue(firstValue);
+                            }
+                        }
+                    }), {
+                        text: '执行',
+                        cls: 'x-btn-text-icon',
+                        iconCls: 'icon-yes',
+                        handler: window.executeQueryOrUpdate = function (btn) {
+                            var iframe = window.frames[0].window;
+                            var sql = iframe.getSelectedText();
+                            if (!sql) {
+                                sql = iframe.getValue();
+                            }
+                            var db = Ext.getCmp('dbCombo_' + (textareaIndex - 1)).getValue();
+                            if (!db || !db.trim()) {
+                                alert('没有选择数据库哦');
+                                return;
+                            }
+                            if (!sql || !sql.trim()) {
+                                alert('没有任何SQL语句哦');
+                                return;
+                            }
+                            result.removeAll();
+                            var panel = new Ext.Panel({
+                                border: false,
+                                html: '<p>执行中...</p>',
+                                autoScroll: true
+                            });
+                            result.add(panel);
+                            result.doLayout();
+                            ($).postJson('/stmt', {boss: boss, db: db, stmt: sql}, function (json) {
+                                var props = json.props;
+                                if (props.exMsg || props.dbMsg) {
+                                    result.removeAll();
+                                    var html = '<p';
+
+                                    if (props.exMsg) {
+                                        html += ' style="color: red;"'
+                                    }
+
+                                    html += '>';
+
+                                    if (props.exMsg) {
+                                        html += props.exMsg.join('<br />');
+                                    } else {
+                                        html += props.dbMsg;
+                                    }
+
+                                    html += '</p>';
+                                    var panel = new Ext.Panel({
+                                        border: false,
+                                        html: html,
+                                        autoScroll: true
+                                    });
+                                    result.add(panel);
+                                    result.doLayout();
+                                } else {
+                                    result.removeAll();
+                                    // TODO grid
+                                    var sm = new Ext.grid.CheckboxSelectionModel({});
+                                    var columns = new Array(props.columns.length);
+                                    for (var i = 0, len = props.columns.length; i < len; i++) {
+                                        columns[i] = {
+                                            header: props.columns[i],
+                                            dataIndex: props.columns[i],
+                                            editor: {
+                                                xtype: 'textfield',
+                                                editable: false,
+                                                readOnly: true,
+                                                listeners: {
+                                                    focus: function (text, e) {
+                                                        text.selectText();
+                                                    }
+                                                }
+                                            }
+                                        };
+                                    }
+                                    var cm = new Ext.grid.ColumnModel({
+                                        defaults: {
+                                            sortable: true
+                                        },
+                                        columns: [sm].concat(columns)
+                                    });
+                                    var store = new Ext.data.GroupingStore({
+                                        data: props.data,
+                                        reader: new Ext.data.JsonReader({
+                                            fields: props.columns,
+                                            idProperty: '' + new Date().getTime()
+                                        })
+                                    });
+                                    var panel = new Ext.grid.EditorGridPanel({
+                                        clicksToEdit: 1,
+                                        border: false,
+                                        sm: sm,
+                                        cm: cm,
+                                        store: store,
+                                        tbar: [props.info, '->', {
+                                            text: '导出',
+                                            cls: 'x-btn-text-icon',
+                                            iconCls: 'icon-save',
+                                            handler: function () {
+                                                alert('这个功能先不弄了');
+                                            }
+                                        }],
+                                        view: new Ext.grid.GroupingView({
+                                            groupByText: '按此列分组',
+                                            showGroupsText: '显示分组',
+                                            groupTextTpl: '{text} ({[values.rs.length]} 条)'
+                                        }),
+                                        loadMask: true,
+                                        stripeRows: true
+                                    });
+                                    result.add(panel);
+                                    result.doLayout();
+                                }
+                            });
+                        }
+                    }],
+                    border: false,
+                    layout: 'fit',
+                    items: {
+                        region: 'center',
+                        layout: 'border',
+                        items: [{
+                            region: 'north',
+                            border: false,
+                            split: true,
+                            height: textareaHeight,
+                            html: '<iframe id="textAreaContainer' + textareaIndex + '" src="/textarea.html?id=' + (++textareaIndex) + '&height=' + textareaHeight + '&ms=' + new Date().getTime() + '" width="100%" height="' + '100%" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes" sandbox="allow-scripts allow-top-navigation allow-same-origin"></iframe>'
+                        }, result]
+                    }
+                };
+
+                new Ext.Viewport({
+                    layout: 'border',
+                    items: [new Ext.Panel({
+                        region: 'west',
+                        title: '数据库',
+                        border: true,
+                        width: 250,
+                        maxWidth: 250,
+                        minWidth: 250,
+                        split: true,
+                        collapsible: true,
+                        layout: 'fit',
+                        items: [new DbNameTree()]
+                    }), new Ext.TabPanel({
+                        id: 'centerTabs',
+                        region: 'center',
+                        enableTabScroll: true,
+                        defaults: {autoScroll: true},
+                        plugins: new Ext.ux.TabCloseMenu({
+                            closeTabText: '关闭标签',
+                            closeOtherTabsText: '关闭其它标签',
+                            closeAllTabsText: '关闭全部'
+                        })
+                    }), new Ext.Panel({
+                        region: 'south',
+                        border: false,
+                        frame: true,
+                        baseCls: 'x-plain',
+                        contentEl: 'south'
+                    })]
+                });
+
+                var tab = new Ext.Panel(defaultTabConfig);
+
+                var tabs = Ext.getCmp('centerTabs');
+                tabs.add(tab).show();
+
+                defaultTabConfig.closable = true;
+
+                Ext.getCmp('dbCombo_' + (textareaIndex - 1)).setValue(dbs[0].v);
+
+                var keyMap = new Ext.KeyMap(Ext.getBody(), [{
+                    key: [87], // w
+                    ctrl: true,
+                    fn: function () {
+                        console.log('按键：', arguments)
+                        var activeTab = tabs.getActiveTab();
+                        var currentIndex = tabs.items.indexOf(activeTab);
+                        if (currentIndex == 0) {
+                            return;
+                        }
+
+                        // 如果关闭的不是最后一个，则展示下一个，如果关闭的是最后一个，则展示上一个
+                        var nextTabIndex = currentIndex + 1;
+                        if (nextTabIndex <= 0) {
+                            nextTabIndex = 0;
+                        } else if (nextTabIndex >= tabs.items.length) {
+                            nextTabIndex = tabs.items.length - 1;
+                        }
+
+                        var nextTab = tabs.items.itemAt(nextTabIndex);
+
+                        tabs.remove(activeTab);
+
+                        tabs.activate(nextTab);
+                        nextTab.focus(false, 10);
+                    },
+                    scope: this,
+                    stopEvent: true
+                }]);
+                keyMap.enable();
+            });
+        });
+    </script>
+
+    <title>Brush</title>
+    <link rel="stylesheet" href="date-time-ux.css">
+</head>
+<body>
+<div id="north">
+</div>
+
+<div id="south" style="text-align: center;">
+    Version: 3.0.19
+</div>
+</body>
+</html>

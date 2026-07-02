@@ -1,0 +1,23 @@
+<style type="text/css">
+  .icon-add {
+    background-image: url(icons/add.png) !important;
+  }
+  .icon-new {
+    background-image: url(icons/add.png) !important;
+  }
+  .icon-view {
+    background-image: url(icons/view.png) !important;
+  }
+  .icon-edit {
+    background-image: url(icons/edit.png) !important;
+  }
+  .icon-delete {
+    background-image: url(icons/cross.png) !important;
+  }
+  .icon-yes {
+    background-image: url(icons/yes.gif) !important;
+  }
+  .icon-save {
+    background-image: url(icons/save.png) !important;
+  }
+</style>

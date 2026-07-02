@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+    <script type="text/javascript" src="/edit_area/edit_area_full.js"></script>
+
+    <title></title>
+</head>
+<body>
+<form>
+    <textarea style="width: 100%; height: 100%;"></textarea>
+</form>
+<script>
+    // 从location中获取id参数
+    var index = location.search.match(/id=(\d+)/)[1];
+    document.title = index;
+
+    var taid = 'sqlTextArea' + index;
+    document.getElementsByTagName('textarea')[0].setAttribute('id', taid);
+
+    var newTabIndex = 0;
+
+    function createNewTab() {
+        var text = '';
+        for (var i = 10; i > 1; i--) {
+            text += '\n';
+        }
+        var cfg = {id: 'tab_' + newTabIndex, text: text, syntax: 'tsql', title: '查询' + (++newTabIndex)};
+        editAreaLoader.openFile(taid, cfg);
+    }
+
+    editAreaLoader.init({
+        id: taid // id of the textarea to transform
+        , start_highlight: true  // if start with highlight
+        , allow_resize: "both"
+        , allow_toggle: false
+        , language: "zh"
+        , syntax: "tsql"
+        , replace_tab_by_spaces: 2
+        , fullscreen: true
+        , max_undo: 128
+        , toolbar: "search, go_to_line, |, undo, redo, |, select_font, |, change_smooth_selection, reset_highlight"
+        , is_multi_files: true
+        , EA_load_callback: "createNewTab"
+        , show_line_colors: true
+        , plugins: "f9"
+    });
+
+    function setSelectionRange(start, end) {
+        editAreaLoader.setSelectionRange(taid, start, end);
+    }
+
+    function getSelectionRange(callback) {
+        var sel = editAreaLoader.getSelectionRange(taid);
+        callback(sel['start'], sel['end']);
+        //alert("start: "+sel["start"]+"\nend: "+sel["end"]);
+    }
+
+    function setSelectedText(value) {
+        editAreaLoader.setSelectedText(taid, value);
+    }
+
+    function getSelectedText() {
+        return editAreaLoader.getSelectedText(taid);
+    }
+
+    function getValue() {
+        return editAreaLoader.getValue(taid);
+    }
+
+    function setValue(value) {
+        return editAreaLoader.setValue(taid, value);
+    }
+
+    var executeQueryOrUpdate = function (e) {
+        if (e.keyCode == 120) {
+            window.parent.executeQueryOrUpdate();
+        }
+    };
+</script>
+</body>
+</html>
