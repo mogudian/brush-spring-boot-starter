@@ -1,6 +1,6 @@
-package com.cotti.franchise.tools.brush.configuration;
+package com.mogudiandian.brush.configuration;
 
-import com.cotti.franchise.tools.brush.model.DataSource;
+import com.mogudiandian.brush.model.DataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;

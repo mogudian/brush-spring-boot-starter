@@ -1,4 +1,4 @@
-package com.cotti.franchise.tools.brush.configuration;
+package com.mogudiandian.brush.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
  * 配置
  */
 @Configuration
-@ServletComponentScan(basePackages = "com.cotti.franchise.tools.brush.servlet")
+@ServletComponentScan(basePackages = "com.mogudiandian.brush.servlet")
 @EnableConfigurationProperties(BrushProperties.class)
 public class BrushConfiguration {
 

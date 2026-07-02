@@ -1,4 +1,4 @@
-package com.cotti.franchise.tools.brush.model;
+package com.mogudiandian.brush.model;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,9 +1,9 @@
-package com.cotti.franchise.tools.brush.model;
+package com.mogudiandian.brush.model;
 
 /**
- * TODO 类注释
+ * 数据源定义
  *
- * @author sunbo
+ * @author Joshua
  * @since 2024/5/23
  */
 public class DataSource {

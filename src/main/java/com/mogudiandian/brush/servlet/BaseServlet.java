@@ -1,13 +1,13 @@
-package com.cotti.franchise.tools.brush.servlet;
+package com.mogudiandian.brush.servlet;
 
 import com.alibaba.fastjson.JSON;
-import com.cotti.franchise.tools.brush.configuration.BrushProperties;
-import com.cotti.franchise.tools.brush.dialect.Dialect;
-import com.cotti.franchise.tools.brush.dialect.MySQLDialect;
-import com.cotti.franchise.tools.brush.model.DataSource;
-import com.cotti.franchise.tools.brush.model.Result;
-import com.cotti.franchise.tools.brush.model.Table;
-import com.cotti.franchise.tools.brush.util.DBUtils;
+import com.mogudiandian.brush.configuration.BrushProperties;
+import com.mogudiandian.brush.dialect.Dialect;
+import com.mogudiandian.brush.dialect.MySQLDialect;
+import com.mogudiandian.brush.model.DataSource;
+import com.mogudiandian.brush.model.Result;
+import com.mogudiandian.brush.model.Table;
+import com.mogudiandian.brush.util.DBUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;

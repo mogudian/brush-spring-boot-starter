@@ -1,23 +1,31 @@
-<style type="text/css">
-  .icon-add {
+.icon-add {
     background-image: url(icons/add.png) !important;
-  }
-  .icon-new {
+}
+
+.icon-new {
     background-image: url(icons/add.png) !important;
-  }
-  .icon-view {
+}
+
+.icon-view {
     background-image: url(icons/view.png) !important;
-  }
-  .icon-edit {
+}
+
+.icon-edit {
     background-image: url(icons/edit.png) !important;
-  }
-  .icon-delete {
+}
+
+.icon-delete {
     background-image: url(icons/cross.png) !important;
-  }
-  .icon-yes {
+}
+
+.icon-yes {
     background-image: url(icons/yes.gif) !important;
-  }
-  .icon-save {
+}
+
+.icon-save {
     background-image: url(icons/save.png) !important;
-  }
-</style>
+}
+
+.icon-go {
+    background-image: url(icons/application_go.png) !important;
+}

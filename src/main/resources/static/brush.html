@@ -35,6 +35,12 @@
     <script src="https://cdnjs.webstatic.cn/ajax/libs/extjs/3.4.1-1/ext-all.js"></script>
     <script src="/cn.js"></script>
 
+    <!-- SQL依赖库 -->
+    <script src="https://cdnjs.webstatic.cn/ajax/libs/sql-formatter/15.6.9/sql-formatter.min.js"></script>
+    <script src="https://npm.webcache.cn/node-sql-parser@5.4.0/umd/mysql.umd.js"></script>
+    <!-- 引入封装好的 formatSQL 函数 -->
+    <script src="/sql-formatter-with-validation.js"></script>
+
     <script type="text/javascript" src="/TabCloseMenu.js"></script>
 
     <script type="text/javascript" src="/SearchField.js"></script>
@@ -147,7 +153,44 @@
                                 combo.setValue(firstValue);
                             }
                         }
-                    }), {
+                    }), '-', {
+                        text: '格式化',
+                        cls: 'x-btn-text-icon',
+                        iconCls: 'icon-go',
+                        handler: window.formatQueryStatement = function (btn) {
+                            var iframe = window.frames[0].window;
+                            var sql = iframe.getSelectedText();
+                            if (!sql) {
+                                sql = iframe.getValue();
+                            }
+                            if (!sql || !sql.trim()) {
+                                return;
+                            }
+                            formatSQL(sql, function (formattedSql) {
+                                if (iframe.getSelectedText()) {
+                                    iframe.setSelectedText(formattedSql);
+                                } else {
+                                    iframe.setValue(formattedSql);
+                                }
+                            }, function (errorMessage) {
+                                result.removeAll();
+
+                                var html = '<p style="color: red;">';
+
+                                html += errorMessage;
+
+                                html += '</p>';
+
+                                var panel = new Ext.Panel({
+                                    border: false,
+                                    html: html,
+                                    autoScroll: true
+                                });
+                                result.add(panel);
+                                result.doLayout();
+                            });
+                        }
+                    }, '-', {
                         text: '执行',
                         cls: 'x-btn-text-icon',
                         iconCls: 'icon-yes',
@@ -167,6 +210,25 @@
                                 return;
                             }
                             result.removeAll();
+
+                            var validateResult = validateSQL(sql);
+                            if (validateResult) {
+                                var html = '<p style="color: red;">';
+
+                                html += validateResult;
+
+                                html += '</p>';
+
+                                var panel = new Ext.Panel({
+                                    border: false,
+                                    html: html,
+                                    autoScroll: true
+                                });
+                                result.add(panel);
+                                result.doLayout();
+                                return;
+                            }
+
                             var panel = new Ext.Panel({
                                 border: false,
                                 html: '<p>执行中...</p>',
@@ -360,7 +422,7 @@
 </div>
 
 <div id="south" style="text-align: center;">
-    Version: 3.0.19
+    Version: 3.0.22
 </div>
 </body>
 </html>
