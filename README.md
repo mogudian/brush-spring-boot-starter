@@ -4,7 +4,7 @@
 
 ```xml
 <dependency>
-    <groupId>com.cotti.franchise</groupId>
+    <groupId>com.mogudiandian</groupId>
     <artifactId>brush-spring-boot-starter</artifactId>
     <version>[3.0.0,4.0.0)</version>
 </dependency>
