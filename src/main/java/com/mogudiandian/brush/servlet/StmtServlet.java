@@ -49,12 +49,12 @@ public class StmtServlet extends BaseServlet {
 
 		sql = sql.trim();
 
-		if (sql.startsWith("select ") || sql.startsWith("show ") || sql.startsWith("explain ")
-		        || sql.startsWith("select\t") || sql.startsWith("show\t") || sql.startsWith("explain\t")
-		        || sql.startsWith("select\n") || sql.startsWith("show\n") || sql.startsWith("explain\n")
-				|| sql.startsWith("SELECT ") || sql.startsWith("SHOW ") || sql.startsWith("EXPLAIN ")
-				|| sql.startsWith("SELECT\t") || sql.startsWith("SHOW\t") || sql.startsWith("EXPLAIN\t")
-				|| sql.startsWith("SELECT\n") || sql.startsWith("SHOW\n") || sql.startsWith("EXPLAIN\n")) {
+		if (sql.startsWith("select ") || sql.startsWith("show ") || sql.startsWith("explain ") || sql.startsWith("desc ")
+		        || sql.startsWith("select\t") || sql.startsWith("show\t") || sql.startsWith("explain\t") || sql.startsWith("desc\t")
+		        || sql.startsWith("select\n") || sql.startsWith("show\n") || sql.startsWith("explain\n") || sql.startsWith("desc\n")
+				|| sql.startsWith("SELECT ") || sql.startsWith("SHOW ") || sql.startsWith("EXPLAIN ") || sql.startsWith("DESC ")
+				|| sql.startsWith("SELECT\t") || sql.startsWith("SHOW\t") || sql.startsWith("EXPLAIN\t") || sql.startsWith("DESC\t")
+				|| sql.startsWith("SELECT\n") || sql.startsWith("SHOW\n") || sql.startsWith("EXPLAIN\n") || sql.startsWith("DESC\n")) {
 			executeQuery(request, response, db, sql);
 		} else {
 			executeUpdate(request, response, db, sql);
